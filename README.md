@@ -1,36 +1,145 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# How Do I Sound? (HDIS)
+
+A modern web application for recording, managing, and storing your audio recordings with real-time waveform visualization.
+
+## Features
+
+✨ **Audio Recording**
+
+- High-quality audio recording with customizable device selection
+- Pause and resume recording capabilities
+- Real-time duration tracking
+- Maximum recording duration: 60 seconds
+
+🎨 **Waveform Visualization**
+
+- Live audio visualization during recording
+- Playback waveform for saved recordings
+- Customizable visualizer with configurable bars and colors
+
+💾 **Storage Options**
+
+- **Local Storage**: IndexedDB for offline recording management
+- **Cloud Storage**: Supabase integration for cloud backup and sync
+- Recording metadata including title, duration, and timestamps
+
+🎵 **Playback**
+
+- Built-in audio player with controls
+- Playback speed control
+- Visual feedback during playback
+
+🔐 **Authentication**
+
+- User authentication system
+- Secure login and signup
+- Protected routes for authenticated users
+
+## Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org) (App Router)
+- **UI**: React 19, TypeScript, Tailwind CSS 4
+- **Storage**: IndexedDB (local), Supabase (cloud)
+- **Audio**: Web Audio API, MediaRecorder API
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+ installed
+- npm, yarn, pnpm, or bun package manager
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd hdis
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Set up environment variables:
+   Create a `.env.local` file with your Supabase credentials:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3003](http://localhost:3003) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+hdis/
+├── app/                    # Next.js app router pages
+│   ├── (auth)/            # Authentication routes
+│   ├── api/               # API routes
+│   ├── dashboard/         # Dashboard pages
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── auth/             # Authentication components
+│   ├── cloud/            # Cloud storage components
+│   └── ui/               # Reusable UI components
+├── hooks/                # Custom React hooks
+├── lib/                  # Utility libraries
+│   ├── audio/           # Audio processing utilities
+│   ├── storage/         # Storage utilities (IndexedDB)
+│   ├── supabase/        # Supabase client & middleware
+│   └── utils/           # Helper functions
+└── types/               # TypeScript type definitions
+```
 
-## Learn More
+## Configuration
 
-To learn more about Next.js, take a look at the following resources:
+Audio recording settings can be customized in `lib/utils/constants.ts`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```typescript
+export const AUDIO_CONFIG = {
+  mimeType: "audio/webm;codecs=opus",
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true,
+};
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+export const MAX_RECORDING_DURATION = 60; // seconds
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+```
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` - Start development server on port 3003
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Browser Support
+
+This app requires a modern browser with support for:
+
+- Web Audio API
+- MediaRecorder API
+- IndexedDB
+- ES6+ JavaScript features
+
+Recommended browsers: Chrome, Edge, Firefox, Safari (latest versions)
+
+## License
+
+[Your License Here]
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
