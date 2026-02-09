@@ -15,8 +15,7 @@ export default function Home() {
               How Do I Sound !?
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
-              Check how do you sound with your mic beforehand to avoid awkward
-              moments
+              Check your mic beforehand to avoid awkward moments
             </p>
             {/* <p className="text-lg text-gray-600 dark:text-gray-400">
               Record, store, and manage your audio recordings directly in your
