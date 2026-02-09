@@ -4,7 +4,8 @@ import AudioPlayer from "@/components/AudioPlayer";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Modal from "@/components/ui/Modal";
-import { useIndexedDB } from "@/hooks/useIndexedDB";
+import { useModal } from "@/contexts/ModalContext";
+import { useRecordings } from "@/contexts/RecordingsContext";
 import {
   formatDate,
   formatDuration,
@@ -21,7 +22,8 @@ export default function RecordingsList() {
     loadRecordings,
     deleteRecording,
     updateTitle,
-  } = useIndexedDB();
+  } = useRecordings();
+  const { showModal } = useModal();
   const [selectedRecording, setSelectedRecording] =
     useState<LocalRecording | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -52,17 +54,25 @@ export default function RecordingsList() {
     setSelectedRecording(recording);
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this recording?")) {
-      const success = await deleteRecording(id);
-      if (success && selectedRecording?.id === id) {
-        setSelectedRecording(null);
-        if (audioURL) {
-          URL.revokeObjectURL(audioURL);
-          setAudioURL(null);
+  const handleDelete = (id: number) => {
+    showModal({
+      title: "Delete Recording",
+      message:
+        "Are you sure you want to delete this recording? This action cannot be undone.",
+      confirmText: "Yes, Delete",
+      cancelText: "Cancel",
+      variant: "danger",
+      onConfirm: async () => {
+        const success = await deleteRecording(id);
+        if (success && selectedRecording?.id === id) {
+          setSelectedRecording(null);
+          if (audioURL) {
+            URL.revokeObjectURL(audioURL);
+            setAudioURL(null);
+          }
         }
-      }
-    }
+      },
+    });
   };
 
   const handleDownload = (recording: LocalRecording) => {
@@ -132,7 +142,7 @@ export default function RecordingsList() {
             No recordings yet
           </h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Start by recording your first audio clip
+            Record different mics. Save and compare the sound!
           </p>
         </div>
       </Card>

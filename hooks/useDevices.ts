@@ -14,7 +14,7 @@ export function useDevices() {
     setError(null);
 
     try {
-      // Request permission first
+      // First - request permission
       await navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then((stream) => {
@@ -22,7 +22,7 @@ export function useDevices() {
           stream.getTracks().forEach((track) => track.stop());
         });
 
-      // Now get the devices list
+      // Get all devices in a list
       const deviceInfos = await navigator.mediaDevices.enumerateDevices();
       const audioInputs = deviceInfos
         .filter((device) => device.kind === "audioinput")
@@ -34,7 +34,7 @@ export function useDevices() {
 
       setDevices(audioInputs);
 
-      // Set default device
+      // Set default
       if (audioInputs.length > 0 && !selectedDeviceId) {
         setSelectedDeviceId(audioInputs[0].deviceId);
       }

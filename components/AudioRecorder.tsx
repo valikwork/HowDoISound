@@ -2,19 +2,24 @@
 
 import AudioPlayer from "@/components/AudioPlayer";
 import DeviceSelector from "@/components/DeviceSelector";
+import WaveformVisualizer from "@/components/WaveformVisualizer";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Modal from "@/components/ui/Modal";
+import { useModal } from "@/contexts/ModalContext";
+import { useRecordings } from "@/contexts/RecordingsContext";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import { useIndexedDB } from "@/hooks/useIndexedDB";
 import { formatDuration } from "@/lib/utils/formatters";
-import { useState } from "react";
+import { MEETING_PHRASES } from "@/lib/utils/meetingPhrases";
+import { useEffect, useState } from "react";
 
 export default function AudioRecorder() {
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [recordingTitle, setRecordingTitle] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+  const [isPhraseFading, setIsPhraseFading] = useState(false);
 
   const {
     isRecording,
@@ -23,6 +28,7 @@ export default function AudioRecorder() {
     audioURL,
     audioBlob,
     error: recorderError,
+    stream,
     startRecording,
     pauseRecording,
     resumeRecording,
@@ -31,7 +37,20 @@ export default function AudioRecorder() {
     resetRecorder,
   } = useAudioRecorder();
 
-  const { saveRecording, error: storageError } = useIndexedDB();
+  const { saveRecording, error: storageError } = useRecordings();
+  const { showModal } = useModal();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsPhraseFading(true);
+      setTimeout(() => {
+        setCurrentPhraseIndex((prev) => (prev + 1) % MEETING_PHRASES.length);
+        setIsPhraseFading(false);
+      }, 500);
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleStartRecording = () => {
     startRecording(selectedDeviceId || undefined);
@@ -61,22 +80,38 @@ export default function AudioRecorder() {
   };
 
   const handleCancel = () => {
-    if (confirm("Are you sure you want to cancel this recording?")) {
-      cancelRecording();
-    }
+    showModal({
+      title: "Cancel Recording",
+      message:
+        "Are you sure you want to cancel this recording? All progress will be lost.",
+      confirmText: "Yes, Cancel",
+      cancelText: "No, Keep Recording",
+      variant: "danger",
+      onConfirm: () => {
+        cancelRecording();
+      },
+    });
   };
 
   const handleDiscard = () => {
-    if (confirm("Are you sure you want to discard this recording?")) {
-      resetRecorder();
-    }
+    showModal({
+      title: "Discard Recording",
+      message:
+        "Are you sure you want to discard this recording? This action cannot be undone.",
+      confirmText: "Yes, Discard",
+      cancelText: "No, Keep It",
+      variant: "danger",
+      onConfirm: () => {
+        resetRecorder();
+      },
+    });
   };
 
   return (
     <>
       <Card>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-          Record Audio
+        <h2 className="text-2xl text-center font-bold text-gray-900 dark:text-gray-100 mb-4">
+          Select the mic
         </h2>
 
         {/* Device Selector */}
@@ -88,6 +123,19 @@ export default function AudioRecorder() {
             />
           </div>
         )}
+
+        <div className="text-center mb-6">
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
+            And say something like...
+          </p>
+          <p
+            className={`text-xl font-medium text-gray-900 dark:text-gray-100 transition-opacity duration-500 ${
+              isPhraseFading ? "opacity-0" : "opacity-100"
+            }`}
+          >
+            &ldquo;{MEETING_PHRASES[currentPhraseIndex]}&rdquo;
+          </p>
+        </div>
 
         {/* Recording Status */}
         {isRecording && (
@@ -102,6 +150,13 @@ export default function AudioRecorder() {
                 </span>
               </div>
             </div>
+
+            {/* Waveform Visualizer */}
+            {!isPaused && stream && (
+              <div className="mb-4">
+                <WaveformVisualizer stream={stream} />
+              </div>
+            )}
 
             {isPaused && (
               <div className="text-center text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -132,10 +187,10 @@ export default function AudioRecorder() {
               onClick={handleStartRecording}
               variant="danger"
               size="lg"
-              className="min-w-[140px]"
+              className="cursor-pointer !w-32 !h-32 !rounded-full !p-0 flex items-center justify-center"
             >
               <svg
-                className="w-5 h-5 mr-2"
+                className="w-16 h-16"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -145,7 +200,6 @@ export default function AudioRecorder() {
                   clipRule="evenodd"
                 />
               </svg>
-              Start Recording
             </Button>
           )}
 

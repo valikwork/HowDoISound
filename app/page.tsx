@@ -8,13 +8,20 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Important call in a minute?
+            </p>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-              How Do I Sound?
+              How Do I Sound !?
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
+              Check how do you sound with your mic beforehand to avoid awkward
+              moments
+            </p>
+            {/* <p className="text-lg text-gray-600 dark:text-gray-400">
               Record, store, and manage your audio recordings directly in your
               browser
-            </p>
+            </p> */}
           </div>
 
           {/* Recorder */}
