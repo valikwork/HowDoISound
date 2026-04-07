@@ -171,7 +171,8 @@ export function useAudioRecorder() {
         URL.revokeObjectURL(audioURL);
       }
     };
-  }, [audioURL, stream]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     isRecording,

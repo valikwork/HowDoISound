@@ -12,7 +12,7 @@ export default function Home() {
               Important call in a minute?
             </p>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-              How Do I Sound !?
+              How Do I Sound !? 🎙️
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
               Check your mic beforehand to avoid awkward moments
@@ -24,7 +24,7 @@ export default function Home() {
           </div>
 
           {/* Recorder */}
-          <div className="mb-8">
+          <div className="mb-8" id="recorder">
             <AudioRecorder />
           </div>
 

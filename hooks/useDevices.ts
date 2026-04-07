@@ -1,13 +1,20 @@
 "use client";
 
 import type { AudioDevice } from "@/types/audio";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+const STORAGE_KEY = "hdis-selected-device";
 
 export function useDevices() {
   const [devices, setDevices] = useState<AudioDevice[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const selectDevice = useCallback((deviceId: string) => {
+    setSelectedDeviceId(deviceId);
+    localStorage.setItem(STORAGE_KEY, deviceId);
+  }, []);
 
   const loadDevices = async () => {
     setIsLoading(true);
@@ -34,9 +41,12 @@ export function useDevices() {
 
       setDevices(audioInputs);
 
-      // Set default
+      // Restore saved device if it's still available, otherwise default to first
       if (audioInputs.length > 0 && !selectedDeviceId) {
-        setSelectedDeviceId(audioInputs[0].deviceId);
+        const savedId = localStorage.getItem(STORAGE_KEY);
+        const savedDeviceExists =
+          savedId && audioInputs.some((d) => d.deviceId === savedId);
+        selectDevice(savedDeviceExists ? savedId : audioInputs[0].deviceId);
       }
     } catch (err) {
       let errorMessage = "Failed to load devices";
@@ -84,7 +94,7 @@ export function useDevices() {
   return {
     devices,
     selectedDeviceId,
-    setSelectedDeviceId,
+    setSelectedDeviceId: selectDevice,
     isLoading,
     error,
     refreshDevices: loadDevices,

@@ -156,7 +156,12 @@ export default function RecordingsList() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             My Recordings ({recordings.length})
           </h2>
-          <Button onClick={loadRecordings} variant="ghost" size="sm">
+          <Button
+            onClick={loadRecordings}
+            variant="ghost"
+            size="sm"
+            title="Reload Recordings"
+          >
             <svg
               className="w-5 h-5"
               fill="none"

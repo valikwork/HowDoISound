@@ -1,5 +1,6 @@
 "use client";
 
+import AudioSlider from "@/components/ui/AudioSlider";
 import Button from "@/components/ui/Button";
 import { formatDuration } from "@/lib/utils/formatters";
 import { useEffect, useRef, useState } from "react";
@@ -55,16 +56,13 @@ export default function AudioPlayer({ audioURL, title }: AudioPlayerProps) {
     setIsPlaying(!isPlaying);
   };
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSliderChange = (newTime: number) => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const newTime = parseFloat(e.target.value);
     audio.currentTime = newTime;
     setCurrentTime(newTime);
   };
-
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div className="w-full bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
@@ -103,14 +101,14 @@ export default function AudioPlayer({ audioURL, title }: AudioPlayerProps) {
         </Button>
 
         <div className="flex-1">
-          <input
-            type="range"
-            min="0"
-            max={duration || 0}
+          <AudioSlider
             value={currentTime}
-            onChange={handleSeek}
-            className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+            max={duration}
+            onChange={handleSliderChange}
+            audioRef={audioRef}
+            isPlaying={isPlaying}
           />
+
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
             <span>{formatDuration(Math.floor(currentTime))}</span>
             <span>{formatDuration(Math.floor(duration))}</span>

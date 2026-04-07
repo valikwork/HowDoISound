@@ -2,6 +2,7 @@
 
 import AudioPlayer from "@/components/AudioPlayer";
 import DeviceSelector from "@/components/DeviceSelector";
+import MeetingPhraseDisplay from "@/components/MeetingPhraseDisplay";
 import WaveformVisualizer from "@/components/WaveformVisualizer";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -10,16 +11,13 @@ import { useModal } from "@/contexts/ModalContext";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { formatDuration } from "@/lib/utils/formatters";
-import { MEETING_PHRASES } from "@/lib/utils/meetingPhrases";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function AudioRecorder() {
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [recordingTitle, setRecordingTitle] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
-  const [isPhraseFading, setIsPhraseFading] = useState(false);
 
   const {
     isRecording,
@@ -39,18 +37,6 @@ export default function AudioRecorder() {
 
   const { saveRecording, error: storageError } = useRecordings();
   const { showModal } = useModal();
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsPhraseFading(true);
-      setTimeout(() => {
-        setCurrentPhraseIndex((prev) => (prev + 1) % MEETING_PHRASES.length);
-        setIsPhraseFading(false);
-      }, 500);
-    }, 15000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const handleStartRecording = () => {
     startRecording(selectedDeviceId || undefined);
@@ -107,11 +93,17 @@ export default function AudioRecorder() {
     });
   };
 
+  const getHeadingText = () => {
+    if (audioURL) return "Recording ready for playback";
+    if (isRecording) return "Recording in progress";
+    return "Select the mic";
+  };
+
   return (
     <>
       <Card>
         <h2 className="text-2xl text-center font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Select the mic
+          {getHeadingText()}
         </h2>
 
         {/* Device Selector */}
@@ -124,18 +116,7 @@ export default function AudioRecorder() {
           </div>
         )}
 
-        <div className="text-center mb-6">
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
-            And say something like...
-          </p>
-          <p
-            className={`text-xl font-medium text-gray-900 dark:text-gray-100 transition-opacity duration-500 ${
-              isPhraseFading ? "opacity-0" : "opacity-100"
-            }`}
-          >
-            &ldquo;{MEETING_PHRASES[currentPhraseIndex]}&rdquo;
-          </p>
-        </div>
+        {!audioURL && <MeetingPhraseDisplay />}
 
         {/* Recording Status */}
         {isRecording && (
