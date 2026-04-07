@@ -11,7 +11,7 @@ import { useModal } from "@/contexts/ModalContext";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { formatDuration } from "@/lib/utils/formatters";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export default function AudioRecorder() {
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
@@ -37,6 +37,10 @@ export default function AudioRecorder() {
 
   const { saveRecording, error: storageError } = useRecordings();
   const { showModal } = useModal();
+
+  const handleDeviceChange = useCallback((deviceId: string) => {
+    setSelectedDeviceId(deviceId);
+  }, []);
 
   const handleStartRecording = () => {
     startRecording(selectedDeviceId || undefined);
@@ -110,7 +114,7 @@ export default function AudioRecorder() {
         {!isRecording && !audioURL && (
           <div className="mb-6">
             <DeviceSelector
-              onDeviceChange={setSelectedDeviceId}
+              onDeviceChange={handleDeviceChange}
               disabled={isRecording}
             />
           </div>
@@ -168,6 +172,7 @@ export default function AudioRecorder() {
               onClick={handleStartRecording}
               variant="danger"
               size="lg"
+              disabled={!selectedDeviceId}
               className="cursor-pointer !w-32 !h-32 !rounded-full !p-0 flex items-center justify-center"
             >
               <svg

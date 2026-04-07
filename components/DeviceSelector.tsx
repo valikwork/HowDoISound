@@ -1,6 +1,7 @@
 "use client";
 
 import { useDevices } from "@/hooks/useDevices";
+import { useEffect } from "react";
 
 interface DeviceSelectorProps {
   onDeviceChange: (deviceId: string) => void;
@@ -13,6 +14,13 @@ export default function DeviceSelector({
 }: DeviceSelectorProps) {
   const { devices, selectedDeviceId, setSelectedDeviceId, isLoading, error } =
     useDevices();
+
+  // Notify parent when default device is selected
+  useEffect(() => {
+    if (selectedDeviceId) {
+      onDeviceChange(selectedDeviceId);
+    }
+  }, [selectedDeviceId, onDeviceChange]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const deviceId = e.target.value;
